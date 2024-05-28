@@ -209,7 +209,7 @@ packages:
     source: hosted
     version: "0.15.4"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
       sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
@@ -280,6 +280,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.2.0"
+  mapbox_polyline_points:
+    dependency: "direct main"
+    description:
+      name: mapbox_polyline_points
+      sha256: "7b31496394fbd38658eaefc73517d222fe4f786d686ea5e62f634c225996d524"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.0.6"
   matcher:
     dependency: transitive
     description:
@@ -630,5 +638,5 @@ packages:
     source: hosted
     version: "1.0.4"
 sdks:
-  dart: ">=3.1.3 <4.0.0"
+  dart: ">=3.1.0 <4.0.0"
   flutter: ">=3.13.0"
