@@ -1,6 +1,7 @@
 package com.example.uber_ride
 
-import io.flutter.embedding.android.FlutterActivity
+import io.flutter.embedding.android.FlutterFragmentActivity
 
-class MainActivity: FlutterActivity() {
+class MainActivity: FlutterFragmentActivity() {
+    // Add any additional configurations if required
 }

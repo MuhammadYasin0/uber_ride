@@ -1,17 +1,16 @@
-
-
 import 'dart:async';
 import 'dart:convert';
-
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_polyline_points/flutter_polyline_points.dart';
-
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-
 import 'package:location/location.dart';
+import 'dart:math' as math;
+import 'package:flutter_stripe/flutter_stripe.dart';
+
 import 'package:uber_ride/domain/app_constants.dart';
-import 'navigation_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:uber_ride/screens/map.dart';
 
 class DashBoardScreen extends StatefulWidget {
   @override
@@ -165,12 +164,11 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                     const EdgeInsets.symmetric(horizontal: 15),
                                 child: GestureDetector(
                                   onTap: () {
-                                    Navigator.of(context)
-                                        .push(MaterialPageRoute(
-                                      builder: (context) =>
-                                      MapPage()
-                                      //    LocationInputScreen(),
-                                    ));
+                                    Navigator.of(context).push(
+                                        MaterialPageRoute(
+                                            builder: (context) => MapPage()
+                                            //    LocationInputScreen(),
+                                            ));
                                   },
                                   child: AbsorbPointer(
                                     child: Container(
@@ -264,9 +262,9 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                     //             // NavigationScreen(
                                     //             //     latController.text,
                                     //             //     lngController.text
-                                                    
+
                                     //             //     )
-                                                    
+
                                     //                 ));
                                   },
                                   child: const Padding(
@@ -534,7 +532,7 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
                                     //             NavigationScreen(
                                     //                 latController.text,
                                     //                 lngController.text
-                                                    
+
                                     //                 )));
                                   },
                                   child: const Padding(
@@ -572,122 +570,159 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   }
 }
 
-class MapPage extends StatefulWidget {
-  const MapPage({super.key});
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<MapPage> createState() => _MapPageState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _MapPageState extends State<MapPage> {
-  Location _locationController = Location();
-  final Completer<GoogleMapController> _mapController =
-      Completer<GoogleMapController>();
-  LatLng _initialCameraPosition = LatLng(37.4223, -122.0848);
-  Marker? _pickUpLocation;
-  Marker? _dropOffLocation;
-  Map<PolylineId, Polyline> _polylines = {};
-  bool _isPickupSet = false;
-
-  @override
-  void initState() {
-    super.initState();
-    getLocationUpdates();
-  }
+class _HomeScreenState extends State<HomeScreen> {
+  Map<String, dynamic>? paymentIntent;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: GoogleMap(
-        onMapCreated: (GoogleMapController controller) {
-          _mapController.complete(controller);
-        },
-        initialCameraPosition: CameraPosition(
-          target: _initialCameraPosition,
-          zoom: 13,
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 229, 121, 85),
+        title: const Text('Stripe Payment'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 40, 35, 35),
+                onPrimary: Colors.white,
+                textStyle: TextStyle(fontSize: 20),
+              ),
+              child: const Text('Confirm Now'),
+              onPressed: () async {
+                await makePayment();
+              },
+            ),
+          ],
         ),
-        markers:
-            {_pickUpLocation, _dropOffLocation}.whereType<Marker>().toSet(),
-        polylines: Set<Polyline>.of(_polylines.values),
-        onTap: _handleMapTap,
       ),
     );
   }
 
-  void _handleMapTap(LatLng tappedPoint) {
-    if (!_isPickupSet) {
-      setState(() {
-        _pickUpLocation = Marker(
-          markerId: MarkerId('pickup'),
-          position: tappedPoint,
-          infoWindow: InfoWindow(title: 'Pick Up Location'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue),
-        );
-        _isPickupSet = true;
-      });
-    } else if (_pickUpLocation != null && _dropOffLocation == null) {
-      setState(() {
-        _dropOffLocation = Marker(
-          markerId: MarkerId('dropoff'),
-          position: tappedPoint,
-          infoWindow: InfoWindow(title: 'Drop Off Location'),
-          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
-        );
-      });
-      _getPolyline();
+  Future<void> makePayment() async {
+    try {
+      paymentIntent = await createPaymentIntent('10000', 'USD');
+
+      var gpay = PaymentSheetGooglePay(
+          merchantCountryCode: "US", currencyCode: "USD", testEnv: true);
+
+      //STEP 2: Initialize Payment Sheet
+      await Stripe.instance
+          .initPaymentSheet(
+              paymentSheetParameters: SetupPaymentSheetParameters(
+                  paymentIntentClientSecret: paymentIntent![
+                      'client_secret'], //Gotten from payment intent
+                  style: ThemeMode.light,
+                  merchantDisplayName: 'Ammad',
+                  googlePay: gpay))
+          .then((value) {});
+
+      //STEP 3: Display Payment sheet
+      displayPaymentSheet();
+    } catch (err) {
+      print(err);
     }
   }
 
-  Future<void> getLocationUpdates() async {
-    var serviceEnabled = await _locationController.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationController.requestService();
-      if (!serviceEnabled) return;
+  displayPaymentSheet() async {
+    try {
+      await Stripe.instance.presentPaymentSheet().then((value) {
+        print("Payment Successfully");
+      });
+    } catch (e) {
+      print('$e');
     }
-
-    var permissionGranted = await _locationController.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationController.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) return;
-    }
-
-    _locationController.onLocationChanged
-        .listen((LocationData currentLocation) {
-      if (_mapController.isCompleted &&
-          currentLocation.latitude != null &&
-          currentLocation.longitude != null) {
-        _mapController.future.then((controller) {
-          controller.animateCamera(CameraUpdate.newLatLng(
-              LatLng(currentLocation.latitude!, currentLocation.longitude!)));
-        });
-      }
-    });
   }
 
-  Future<void> _getPolyline() async {
-    if (_pickUpLocation != null && _dropOffLocation != null) {
-      PolylinePoints polylinePoints = PolylinePoints();
-      PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
-        'AIzaSyDPoZ1NqYsd73JVu-jKFjQvVqc2ZSQsaPg', // Don't forget to replace with your API Key
-        PointLatLng(_pickUpLocation!.position.latitude,
-            _pickUpLocation!.position.longitude),
-        PointLatLng(_dropOffLocation!.position.latitude,
-            _dropOffLocation!.position.longitude),
-        travelMode: TravelMode.driving,
+  createPaymentIntent(String amount, String currency) async {
+    try {
+      Map<String, dynamic> body = {
+        'amount': amount,
+        'currency': currency,
+      };
+
+      var response = await http.post(
+        Uri.parse('https://api.stripe.com/v1/payment_intents'),
+        headers: {
+          'Authorization':
+              'Bearer sk_test_51PMAmX06N6gtIqVLfpzHWB8uHUdTuN8gxxVrfBwOhKimZmVcd39Yh4T26HQFsNOImQp9kyV8ghpQOXROHSufdsK900tikEjkr1',
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: body,
       );
-
-      if (result.points.isNotEmpty) {
-        setState(() {
-          _polylines[PolylineId('route')] = Polyline(
-            polylineId: PolylineId('route'),
-            points: result.points
-                .map((point) => LatLng(point.latitude, point.longitude))
-                .toList(),
-            color: Colors.blue,
-            width: 5,
-          );
-        });
-      }
+      return json.decode(response.body);
+    } catch (err) {
+      throw Exception(err.toString());
     }
+  }
+}
+
+class PaymentMethodScreen extends StatefulWidget {
+  @override
+  _PaymentMethodScreenState createState() => _PaymentMethodScreenState();
+}
+
+class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Choose Payment Method"),
+        backgroundColor: Color.fromARGB(255, 229, 121, 85),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 40, 35, 35),
+                onPrimary: Colors.white,
+                textStyle: TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text("Cash Payment Selected"),
+                    content: Text("You have chosen to pay with cash."),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text("OK"),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text("Pay with Cash"),
+            ),
+            SizedBox(height: 20),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color.fromARGB(255, 213, 129, 3),
+                onPrimary: Colors.white,
+                textStyle: TextStyle(fontSize: 20),
+              ),
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                );
+              },
+              child: Text("Pay with Card"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
