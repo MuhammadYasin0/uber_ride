@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:uber_ride/screens/dashboard_screen.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:uber_ride/screens/onboarding_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,6 +20,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        debugShowCheckedModeBanner: false, home: DashBoardScreen());
+        debugShowCheckedModeBanner: false, home: OnBoardingScreen());
   }
 }

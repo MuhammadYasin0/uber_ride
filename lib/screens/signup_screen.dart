@@ -18,16 +18,16 @@ class _SignUpPageState extends State<SignUpPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
- backgroundColor: Color.fromARGB(255, 229, 121, 85),
+ backgroundColor: const Color.fromARGB(255, 229, 121, 85),
 
       body: SingleChildScrollView(
         child: Container(
           child: Column(
             children: [
-              Row(
+              const Row(
                 children: [
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(30, 140, 0, 0),
+                    padding: EdgeInsets.fromLTRB(30, 140, 0, 0),
                     child: Row(
                       children: [
                         Text('SignUp ',
@@ -48,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
              
               
       
-              SizedBox(height: 40,),
+              const SizedBox(height: 40,),
 
 
                Padding(
@@ -63,10 +63,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: TextField(
                       
-                      cursorColor: Color.fromARGB(255, 213, 129, 3),
+                      cursorColor: const Color.fromARGB(255, 213, 129, 3),
                       controller: nameController,
                       
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         
                         border: InputBorder.none,
                         fillColor: Colors.white,
@@ -78,7 +78,7 @@ class _SignUpPageState extends State<SignUpPage> {
                   ),
                 )),
 
-                SizedBox(height: 30,),
+                const SizedBox(height: 30,),
       
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -92,10 +92,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: TextField(
                       
-                      cursorColor: Color.fromARGB(255, 213, 129, 3),
+                      cursorColor: const Color.fromARGB(255, 213, 129, 3),
                       controller: emailController,
                       
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         
                         border: InputBorder.none,
                         fillColor: Colors.white,
@@ -108,7 +108,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
       
-              SizedBox(height: 30,),
+              const SizedBox(height: 30,),
       
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -122,10 +122,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: TextField(
                       
-                      cursorColor: Color.fromARGB(255, 213, 129, 3),
+                      cursorColor: const Color.fromARGB(255, 213, 129, 3),
                       controller: passwordController,
                       
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         
                         border: InputBorder.none,
                         fillColor: Colors.white,
@@ -139,7 +139,7 @@ class _SignUpPageState extends State<SignUpPage> {
                 ),
               ),
 
-                SizedBox(height: 30,),
+                const SizedBox(height: 30,),
 
                     Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 35),
@@ -153,10 +153,10 @@ class _SignUpPageState extends State<SignUpPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 24),
                     child: TextField(
                       
-                      cursorColor: Color.fromARGB(255, 213, 129, 3),
+                      cursorColor: const Color.fromARGB(255, 213, 129, 3),
                       controller: phoneController,
                       
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         
                         border: InputBorder.none,
                         fillColor: Colors.white,
@@ -185,10 +185,10 @@ class _SignUpPageState extends State<SignUpPage> {
                                     ),
                                     
                                 onPressed: () {
-                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> LoginScreen()));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context)=> const LoginScreen()));
                                 },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
+                                child: const Padding(
+                                  padding: EdgeInsets.symmetric(
                                       horizontal: 130, vertical: 20),
                                   child: Text(
                                     "SignUp",

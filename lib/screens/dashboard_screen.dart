@@ -7,18 +7,21 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'dart:math' as math;
 import 'package:flutter_stripe/flutter_stripe.dart';
-
 import 'package:uber_ride/domain/app_constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:uber_ride/screens/map.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:uber_ride/domain/app_constants.dart';
+import 'package:uber_ride/screens/map.dart';
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class DashBoardScreen extends StatefulWidget {
-  @override
-  State<DashBoardScreen> createState() => _DashBoardScreenState();
-}
+import 'package:get/get.dart';
+import 'package:flutter/material.dart';
 
-class _DashBoardScreenState extends State<DashBoardScreen> {
-  bool isSelected = false;
+class DashboardController extends GetxController {
+  var isSelected = false.obs;
 
   TextEditingController latController = TextEditingController();
   TextEditingController lngController = TextEditingController();
@@ -26,545 +29,530 @@ class _DashBoardScreenState extends State<DashBoardScreen> {
   TextEditingController toController = TextEditingController();
   TextEditingController fareController = TextEditingController();
 
+  void toggleSelection() {
+    isSelected.value = !isSelected.value;
+  }
+}
+
+class DashBoardScreen extends StatelessWidget {
+  final DashboardController controller = Get.put(DashboardController());
+
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    final buttonHeight = mediaQuery.size.height * 0.06;
+    final buttonPaddingHorizontal = mediaQuery.size.width * 0.1;
+    final buttonFontSize = mediaQuery.size.height * 0.022;
+
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 229, 121, 85),
       body: Padding(
-        padding: const EdgeInsets.all(18.0),
-        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Image.asset('assets/icons/ic_location.png'),
-          const Text(
-            'Uber Ride',
-            style: TextStyle(fontSize: 40, color: Colors.white),
-          ),
-          const SizedBox(height: 30),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 5),
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //         border: Border.all(color: Colors.black26),
-          //         color: Colors.white,
-          //         borderRadius: BorderRadius.circular(20)),
-          //     child: Padding(
-          //       padding: const EdgeInsets.symmetric(horizontal: 24),
-          //       child: TextField(
-          //         cursorColor: Color.fromARGB(255, 213, 129, 3),
-          //         //*************** */
-          //         decoration: InputDecoration(
-          //           border: InputBorder.none,
-          //           fillColor: Colors.white,
-          //           labelText: 'Latitude',
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          //SizedBox(height: 20),
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 5),
-          //   child: Container(
-          //     decoration: BoxDecoration(
-          //         border: Border.all(color: Colors.black26),
-          //         color: Colors.white,
-          //         borderRadius: BorderRadius.circular(20)),
-          //     child: Padding(
-          //       padding: const EdgeInsets.symmetric(horizontal: 24),
-          //       child: TextField(
-          //         cursorColor: Color.fromARGB(255, 213, 129, 3),
-          //         //************ */
-          //         decoration: InputDecoration(
-          //           border: InputBorder.none,
-          //           fillColor: Colors.white,
-          //           labelText: 'Longitude',
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          // ),
-          const SizedBox(height: 40),
-          Container(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.all(mediaQuery.size.width * 0.05),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/icons/ic_location.png',
+              width: mediaQuery.size.width * 0.3,
+              height: mediaQuery.size.height * 0.1,
+            ),
+            const Text(
+              'Uber Ride',
+              style: TextStyle(fontSize: 40, color: Colors.white),
+            ),
+            SizedBox(height: mediaQuery.size.height * 0.05),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30))),
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: const Color.fromARGB(255, 40, 35, 35),
-                  shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(10))),
-                  context: context,
-                  builder: (_) {
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: Container(
-                            child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: AppConstants.rideCategory.length,
-                                itemBuilder: ((_, index) {
-                                  Map<String, dynamic> currItem =
-                                      AppConstants.rideCategory[index];
-                                  return Container(
-                                    decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: const Color.fromARGB(255, 40, 35, 35),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(10),
+                      ),
+                    ),
+                    context: context,
+                    builder: (_) {
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(mediaQuery.size.width * 0.05),
+                          child: Column(
+                            children: [
+                              SizedBox(height: mediaQuery.size.height * 0.05),
+                              SizedBox(
+                                height: mediaQuery.size.height * 0.25,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: AppConstants.rideCategory.length,
+                                  itemBuilder: ((_, index) {
+                                    Map<String, dynamic> currItem =
+                                        AppConstants.rideCategory[index];
+                                    return Container(
+                                      decoration: BoxDecoration(
                                         color: const Color.fromARGB(
                                             255, 78, 77, 77),
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                    margin: const EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 50),
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 18.0, right: 18.0),
-                                              child: ClipRRect(
-                                                child: Image.asset(
-                                                  currItem['imgPath'],
-                                                  width: 100,
-                                                  height: 60,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 7),
-                                        Row(
-                                          children: [
-                                            Text(
-                                              currItem["title"],
-                                              style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                })),
-                          ),
-                        ),
-                        Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                  border: Border.all(color: Colors.black26),
-                                  color: const Color.fromARGB(255, 99, 95, 95),
-                                  borderRadius: BorderRadius.circular(20)),
-                              child: // 'From' TextField
-                                  Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 15),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) => MapPage()
-                                            //    LocationInputScreen(),
-                                            ));
-                                  },
-                                  child: AbsorbPointer(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                          border:
-                                              Border.all(color: Colors.black26),
-                                          color: const Color.fromARGB(
-                                              255, 99, 95, 95),
-                                          borderRadius:
-                                              BorderRadius.circular(20)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 5),
-                                        child: TextField(
-                                          cursorColor: const Color.fromARGB(
-                                              255, 213, 129, 3),
-                                          controller: latController,
-                                          decoration: const InputDecoration(
-                                            border: InputBorder.none,
-                                            fillColor: Colors.white,
-                                            labelText: 'From',
-                                            labelStyle: TextStyle(
-                                              color: Colors.white60,
-                                              fontSize: 22,
-                                            ),
-                                            prefixIcon: Icon(
-                                              Icons.location_on,
-                                              color: Colors.white,
+                                        borderRadius: BorderRadius.circular(30),
+                                      ),
+                                      margin: EdgeInsets.symmetric(
+                                        horizontal:
+                                            mediaQuery.size.width * 0.02,
+                                      ),
+                                      padding: EdgeInsets.all(
+                                        mediaQuery.size.width * 0.02,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            child: Image.asset(
+                                              currItem['imgPath'],
+                                              width:
+                                                  mediaQuery.size.width * 0.25,
+                                              height:
+                                                  mediaQuery.size.height * 0.15,
                                             ),
                                           ),
+                                          Text(
+                                            currItem["title"],
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize:
+                                                  mediaQuery.size.height * 0.02,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }),
+                                ),
+                              ),
+                              SizedBox(height: mediaQuery.size.height * 0.02),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => MapPage(),
+                                    ),
+                                  );
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.black26),
+                                    color:
+                                        const Color.fromARGB(255, 99, 95, 95),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: mediaQuery.size.width * 0.05,
+                                  ),
+                                  child: AbsorbPointer(
+                                    child: TextField(
+                                      cursorColor: const Color.fromARGB(
+                                          255, 213, 129, 3),
+                                      controller: controller.latController,
+                                      decoration: InputDecoration(
+                                        border: InputBorder.none,
+                                        fillColor: Colors.white,
+                                        labelText: 'From',
+                                        labelStyle: TextStyle(
+                                          color: Colors.white60,
+                                          fontSize:
+                                              mediaQuery.size.height * 0.02,
+                                        ),
+                                        prefixIcon: Icon(
+                                          Icons.location_on,
+                                          color: Colors.white,
+                                          size: mediaQuery.size.height * 0.03,
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            )),
-                        const SizedBox(height: 20),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 17),
-                          child: Container(
-                            decoration: BoxDecoration(
-                                border: Border.all(color: Colors.black26),
-                                color: const Color.fromARGB(255, 99, 95, 95),
-                                borderRadius: BorderRadius.circular(20)),
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 5),
-                              child: TextField(
-                                cursorColor:
-                                    const Color.fromARGB(255, 213, 129, 3),
-                                controller: fareController,
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  fillColor: Colors.white,
-                                  labelText: 'Offer your fare',
-                                  labelStyle: const TextStyle(
-                                    color: Colors.white60,
-                                    fontSize: 22,
-                                  ),
-                                  prefixIcon: Image.asset(
-                                    'assets/icons/ic_pkr.png',
-                                    width: 40,
-                                    color: Colors.white,
-                                  ),
-                                  suffixIcon: const Icon(
-                                    Icons.money,
-                                    color: Colors.green,
+                              SizedBox(height: mediaQuery.size.height * 0.02),
+                              Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Colors.black26),
+                                  color: const Color.fromARGB(255, 99, 95, 95),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: mediaQuery.size.width * 0.05,
+                                ),
+                                child: TextField(
+                                  cursorColor:
+                                      const Color.fromARGB(255, 213, 129, 3),
+                                  controller: controller.fareController,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    fillColor: Colors.white,
+                                    labelText: 'Offer your fare',
+                                    labelStyle: TextStyle(
+                                      color: Colors.white60,
+                                      fontSize: mediaQuery.size.height * 0.02,
+                                    ),
+                                    prefixIcon: Image.asset(
+                                      'assets/icons/ic_pkr.png',
+                                      width: mediaQuery.size.width * 0.1,
+                                      color: Colors.white,
+                                    ),
+                                    suffixIcon: Icon(
+                                      Icons.money,
+                                      color: Colors.green,
+                                      size: mediaQuery.size.height * 0.03,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(22, 0, 0, 0),
-                          child: Row(
-                            children: [
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
+                              SizedBox(height: mediaQuery.size.height * 0.02),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color.fromARGB(
                                           255, 213, 129, 3),
                                       shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10))),
-                                  onPressed: () {
-                                    // Navigator.of(context).push(
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             // NavigationScreen(
-                                    //             //     latController.text,
-                                    //             //     lngController.text
-
-                                    //             //     )
-
-                                    //                 ));
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 80, vertical: 18),
-                                    child: Text(
-                                      'Find a driver',
-                                      style: TextStyle(fontSize: 22),
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  )),
-                              const SizedBox(width: 20),
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
+                                    onPressed: () {
+                                      // Your navigation logic here
+                                    },
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: mediaQuery.size.width * 0.1,
+                                        vertical: buttonHeight / 3,
+                                      ),
+                                      child: Text(
+                                        'Find a driver',
+                                        style:
+                                            TextStyle(fontSize: buttonFontSize),
+                                      ),
+                                    ),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
                                       backgroundColor: const Color.fromARGB(
                                           255, 213, 129, 3),
                                       shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(10))),
-                                  onPressed: () {},
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 18),
-                                    child: Icon(
-                                      Icons.route,
-                                      size: 25,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
                                     ),
-                                  )),
+                                    onPressed: () {},
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal:
+                                            mediaQuery.size.width * 0.05,
+                                        vertical: buttonHeight / 3,
+                                      ),
+                                      child: Icon(
+                                        Icons.route,
+                                        size: buttonHeight / 2,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: mediaQuery.size.height * 0.03),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 25)
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 120, vertical: 20),
-                child: Text(
-                  "Book your Ride",
-                  style: TextStyle(
-                      fontSize: 18,
+                      );
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: buttonPaddingHorizontal,
+                    vertical: buttonHeight / 3,
+                  ),
+                  child: Text(
+                    "Book your Ride",
+                    style: TextStyle(
+                      fontSize: buttonFontSize,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-
-          const SizedBox(
-            height: 20,
-          ),
-
-          // Payment Method
-
-          Container(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
+            SizedBox(height: mediaQuery.size.height * 0.02),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black,
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30))),
-              onPressed: () {
-                showModalBottomSheet(
-                  backgroundColor: const Color.fromARGB(255, 40, 35, 35),
-                  shape: const RoundedRectangleBorder(
-                      borderRadius:
-                          BorderRadius.vertical(top: Radius.circular(10))),
-                  context: context,
-                  builder: (_) {
-                    return Column(
-                      children: [
-                        const SizedBox(
-                          height: 20,
-                        ),
-                        const Text(
-                          'Payment Methods',
-                          style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
-                        ),
-                        const SizedBox(
-                          height: 30,
-                        ),
-                        Expanded(
-                          child: ListView(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                ),
+                onPressed: () {
+                  showModalBottomSheet(
+                    backgroundColor: const Color.fromARGB(255, 40, 35, 35),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(10),
+                      ),
+                    ),
+                    context: context,
+                    builder: (_) {
+                      return SingleChildScrollView(
+                        child: Padding(
+                          padding: EdgeInsets.all(mediaQuery.size.width * 0.05),
+                          child: Column(
                             children: [
-                              ListTile(
-                                leading: Container(
-                                  width: 60,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      color: Colors.white),
-                                  child: Image.asset(
-                                    'assets/icons/ic_easypaisa.png',
-                                    width: 50,
-                                    height: 50,
-                                  ),
+                              SizedBox(height: mediaQuery.size.height * 0.02),
+                              const Text(
+                                'Payment Methods',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
-                                title: const Text(
-                                  'EasyPaisa',
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                                subtitle: const Text(
-                                  'Payment by Easypaisa after the ride',
-                                  style: TextStyle(
-                                      fontSize: 17, color: Colors.white38),
-                                ),
-                                trailing: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isSelected = !isSelected;
-                                      print('isSelected: $isSelected');
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 45.0,
-                                    height: 45.0,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color.fromARGB(
-                                              255, 213, 129, 3)
-                                          : Colors.white12,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () {
-                                  // Handle tap
-                                },
                               ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              const Divider(
-                                color: Colors.white24,
-                                thickness: 1.0,
-                                indent: 16.0,
-                                endIndent: 16.0,
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              ListTile(
-                                leading: Container(
-                                  width: 60,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      color: Colors.white),
-                                  child: Image.asset(
-                                    'assets/icons/ic_jazzcash.png',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                title: const Text(
-                                  'JazzCash',
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                                subtitle: const Text(
-                                  'Payment by Jazzcash after the ride',
-                                  style: TextStyle(
-                                      fontSize: 17, color: Colors.white38),
-                                ),
-                                trailing: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isSelected = !isSelected;
-                                      print('isSelected: $isSelected');
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 45.0,
-                                    height: 45.0,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color.fromARGB(
-                                              255, 213, 129, 3)
-                                          : Colors.white12,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () {
-                                  // Handle tap
-                                },
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              const Divider(
-                                color: Colors.white24,
-                                thickness: 1.0,
-                                indent: 16.0,
-                                endIndent: 16.0,
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              ListTile(
-                                leading: Container(
-                                  width: 60,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(5.0),
-                                      color: Colors.white),
-                                  child: Image.asset(
-                                    'assets/icons/ic_rupees.png',
-                                    width: 50,
-                                    height: 50,
-                                  ),
-                                ),
-                                title: const Text(
-                                  'Cash',
-                                  style: TextStyle(
-                                      fontSize: 20, color: Colors.white),
-                                ),
-                                trailing: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isSelected = !isSelected;
-                                      print('isSelected: $isSelected');
-                                    });
-                                  },
-                                  child: Container(
-                                    width: 45.0,
-                                    height: 45.0,
-                                    decoration: BoxDecoration(
-                                      color: isSelected
-                                          ? const Color.fromARGB(
-                                              255, 213, 129, 3)
-                                          : Colors.white12,
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                                onTap: () {
-                                  // Handle tap
-                                },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(22, 0, 0, 0),
-                          child: Row(
-                            children: [
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color.fromARGB(
-                                          255, 213, 129, 3),
-                                      shape: RoundedRectangleBorder(
+                              SizedBox(height: mediaQuery.size.height * 0.03),
+                              Expanded(
+                                child: ListView(
+                                  shrinkWrap: true,
+                                  children: [
+                                    ListTile(
+                                      leading: Container(
+                                        width: mediaQuery.size.width * 0.15,
+                                        height: mediaQuery.size.height * 0.05,
+                                        decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(10))),
-                                  onPressed: () {
-                                    // Navigator.of(context).push(
-                                    //     MaterialPageRoute(
-                                    //         builder: (context) =>
-                                    //             NavigationScreen(
-                                    //                 latController.text,
-                                    //                 lngController.text
-
-                                    //                 )));
-                                  },
-                                  child: const Padding(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 160, vertical: 18),
-                                    child: Text(
-                                      'Done',
-                                      style: TextStyle(fontSize: 22),
+                                              BorderRadius.circular(5.0),
+                                          color: Colors.white,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/icons/ic_easypaisa.png',
+                                          width: mediaQuery.size.width * 0.12,
+                                          height: mediaQuery.size.height * 0.05,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'EasyPaisa',
+                                        style: TextStyle(
+                                          fontSize:
+                                              mediaQuery.size.height * 0.02,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        'Payment by Easypaisa after the ride',
+                                        style: TextStyle(
+                                          fontSize:
+                                              mediaQuery.size.height * 0.018,
+                                          color: Colors.white38,
+                                        ),
+                                      ),
+                                      trailing: GestureDetector(
+                                        onTap: controller.toggleSelection,
+                                        child: Obx(
+                                          () => Container(
+                                            width: mediaQuery.size.width * 0.1,
+                                            height: mediaQuery.size.width * 0.1,
+                                            decoration: BoxDecoration(
+                                              color: controller.isSelected.value
+                                                  ? const Color.fromARGB(
+                                                      255, 213, 129, 3)
+                                                  : Colors.white12,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        // Handle tap
+                                      },
                                     ),
-                                  )),
+                                    SizedBox(
+                                        height: mediaQuery.size.height * 0.005),
+                                    const Divider(
+                                      color: Colors.white24,
+                                      thickness: 1.0,
+                                      indent: 16.0,
+                                      endIndent: 16.0,
+                                    ),
+                                    SizedBox(
+                                        height: mediaQuery.size.height * 0.005),
+                                    ListTile(
+                                      leading: Container(
+                                        width: mediaQuery.size.width * 0.15,
+                                        height: mediaQuery.size.height * 0.05,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                          color: Colors.white,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/icons/ic_jazzcash.png',
+                                          width: mediaQuery.size.width * 0.12,
+                                          height: mediaQuery.size.height * 0.05,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'JazzCash',
+                                        style: TextStyle(
+                                          fontSize:
+                                              mediaQuery.size.height * 0.02,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        'Payment by Jazzcash after the ride',
+                                        style: TextStyle(
+                                          fontSize:
+                                              mediaQuery.size.height * 0.018,
+                                          color: Colors.white38,
+                                        ),
+                                      ),
+                                      trailing: GestureDetector(
+                                        onTap: controller.toggleSelection,
+                                        child: Obx(
+                                          () => Container(
+                                            width: mediaQuery.size.width * 0.1,
+                                            height: mediaQuery.size.width * 0.1,
+                                            decoration: BoxDecoration(
+                                              color: controller.isSelected.value
+                                                  ? const Color.fromARGB(
+                                                      255, 213, 129, 3)
+                                                  : Colors.white12,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        // Handle tap
+                                      },
+                                    ),
+                                    SizedBox(
+                                        height: mediaQuery.size.height * 0.005),
+                                    const Divider(
+                                      color: Colors.white24,
+                                      thickness: 1.0,
+                                      indent: 16.0,
+                                      endIndent: 16.0,
+                                    ),
+                                    SizedBox(
+                                        height: mediaQuery.size.height * 0.005),
+                                    ListTile(
+                                      leading: Container(
+                                        width: mediaQuery.size.width * 0.15,
+                                        height: mediaQuery.size.height * 0.05,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                          color: Colors.white,
+                                        ),
+                                        child: Image.asset(
+                                          'assets/icons/ic_rupees.png',
+                                          width: mediaQuery.size.width * 0.12,
+                                          height: mediaQuery.size.height * 0.05,
+                                        ),
+                                      ),
+                                      title: Text(
+                                        'Cash',
+                                        style: TextStyle(
+                                          fontSize:
+                                              mediaQuery.size.height * 0.02,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      trailing: GestureDetector(
+                                        onTap: controller.toggleSelection,
+                                        child: Obx(
+                                          () => Container(
+                                            width: mediaQuery.size.width * 0.1,
+                                            height: mediaQuery.size.width * 0.1,
+                                            decoration: BoxDecoration(
+                                              color: controller.isSelected.value
+                                                  ? const Color.fromARGB(
+                                                      255, 213, 129, 3)
+                                                  : Colors.white12,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      onTap: () {
+                                        // Handle tap
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(height: 15),
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                    mediaQuery.size.width * 0.05, 0, 0, 0),
+                                child: Row(
+                                  children: [
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: const Color.fromARGB(
+                                            255, 213, 129, 3),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        // Your navigation logic here
+                                      },
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: buttonPaddingHorizontal,
+                                          vertical: buttonHeight / 3,
+                                        ),
+                                        child: Text(
+                                          'Done',
+                                          style: TextStyle(
+                                              fontSize: buttonFontSize),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              SizedBox(height: mediaQuery.size.height * 0.15),
                             ],
                           ),
                         ),
-                        const SizedBox(height: 105)
-                      ],
-                    );
-                  },
-                );
-              },
-              child: const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 70, vertical: 20),
-                child: Text(
-                  "Select your Payment Method",
-                  style: TextStyle(
-                      fontSize: 18,
+                      );
+                    },
+                  );
+                },
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: buttonPaddingHorizontal,
+                    vertical: buttonHeight / 3,
+                  ),
+                  child: Text(
+                    "Select your Payment Method",
+                    style: TextStyle(
+                      fontSize: buttonFontSize,
                       color: Colors.white,
-                      fontWeight: FontWeight.bold),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     );
   }
@@ -584,7 +572,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 229, 121, 85),
+        backgroundColor: const Color.fromARGB(255, 229, 121, 85),
         title: const Text('Stripe Payment'),
       ),
       body: Center(
@@ -593,9 +581,9 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 40, 35, 35),
+                backgroundColor: const Color.fromARGB(255, 40, 35, 35),
                 onPrimary: Colors.white,
-                textStyle: TextStyle(fontSize: 20),
+                textStyle: const TextStyle(fontSize: 20),
               ),
               child: const Text('Confirm Now'),
               onPressed: () async {
@@ -612,7 +600,7 @@ class _HomeScreenState extends State<HomeScreen> {
     try {
       paymentIntent = await createPaymentIntent('10000', 'USD');
 
-      var gpay = PaymentSheetGooglePay(
+      var gpay = const PaymentSheetGooglePay(
           merchantCountryCode: "US", currencyCode: "USD", testEnv: true);
 
       //STEP 2: Initialize Payment Sheet
@@ -676,8 +664,8 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Choose Payment Method"),
-        backgroundColor: Color.fromARGB(255, 229, 121, 85),
+        title: const Text("Choose Payment Method"),
+        backgroundColor: const Color.fromARGB(255, 229, 121, 85),
       ),
       body: Center(
         child: Column(
@@ -685,40 +673,40 @@ class _PaymentMethodScreenState extends State<PaymentMethodScreen> {
           children: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 40, 35, 35),
+                backgroundColor: const Color.fromARGB(255, 40, 35, 35),
                 onPrimary: Colors.white,
-                textStyle: TextStyle(fontSize: 20),
+                textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
                 showDialog(
                   context: context,
                   builder: (context) => AlertDialog(
-                    title: Text("Cash Payment Selected"),
-                    content: Text("You have chosen to pay with cash."),
+                    title: const Text("Cash Payment Selected"),
+                    content: const Text("You have chosen to pay with cash."),
                     actions: <Widget>[
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: Text("OK"),
+                        child: const Text("OK"),
                       ),
                     ],
                   ),
                 );
               },
-              child: Text("Pay with Cash"),
+              child: const Text("Pay with Cash"),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color.fromARGB(255, 213, 129, 3),
+                backgroundColor: const Color.fromARGB(255, 213, 129, 3),
                 onPrimary: Colors.white,
-                textStyle: TextStyle(fontSize: 20),
+                textStyle: const TextStyle(fontSize: 20),
               ),
               onPressed: () {
                 Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => const HomeScreen()),
                 );
               },
-              child: Text("Pay with Card"),
+              child: const Text("Pay with Card"),
             ),
           ],
         ),

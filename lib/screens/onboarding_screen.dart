@@ -7,96 +7,108 @@ class OnBoardingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+
     return Scaffold(
       backgroundColor: Color.fromARGB(255, 229, 121, 85),
       body: Stack(
         children: [
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(20, 140, 0, 0),
-            child: Image.asset('assets/icons/ic_car.png',
-            width: 150,
+          Positioned(
+            left: mediaQuery.size.width * 0.05,
+            top: mediaQuery.size.height * 0.2,
+            child: Image.asset(
+              'assets/icons/ic_car.png',
+              width: mediaQuery.size.width * 0.4,
             ),
           ),
- 
-          Padding(
-            padding: const EdgeInsets.fromLTRB(30, 280, 0, 0),
-            child: Text('Start your Jounrney with us',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-            ),
-            ),
-          ),
-          
-          Padding(
-            padding: const EdgeInsets.fromLTRB(35, 350, 0, 0),
-            child: Text('Users have the liberty to choose the',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-            ),
+          Positioned(
+            left: mediaQuery.size.width * 0.08,
+            top: mediaQuery.size.height * 0.4,
+            child: Text(
+              'Start your Journey with us',
+              style: TextStyle(
+                fontSize: mediaQuery.size.height * 0.04,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(35, 370, 0, 0),
-            child: Text('type of vehicle as per their need.',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-              color: Colors.white
-            ),
+          Positioned(
+            left: mediaQuery.size.width * 0.1,
+            top: mediaQuery.size.height * 0.5,
+            child: Text(
+              'Users have the liberty to choose the',
+              style: TextStyle(
+                fontSize: mediaQuery.size.height * 0.02,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
             ),
           ),
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(0, 400, 0, 0),
-            child: Image.asset('assets/icons/ic_carlocation.png'),
+          Positioned(
+            left: mediaQuery.size.width * 0.1,
+            top: mediaQuery.size.height * 0.52,
+            child: Text(
+              'type of vehicle as per their need.',
+              style: TextStyle(
+                fontSize: mediaQuery.size.height * 0.02,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
-
-
-          Padding(
-            padding: const EdgeInsets.fromLTRB(50, 700, 50, 0),
+          Positioned(
+            top: mediaQuery.size.height * 0.55,
+            child: Image.asset(
+              'assets/icons/ic_carlocation.png',
+              width: mediaQuery.size.width,
+            ),
+          ),
+          Positioned(
+            left: mediaQuery.size.width * 0.1,
+            right: mediaQuery.size.width * 0.1,
+            bottom: mediaQuery.size.height * 0.1,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor:Colors.black,
-                                    
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30))
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30),
+                ),
               ),
-              
-              onPressed: (){
-             Navigator.push(context, MaterialPageRoute(builder: (context)=> DashBoardScreen()));
-                                    }, child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                      horizontal: 0, vertical: 20),
-                                      child: Row(
-                                        children: [
-                                          Text("Let's get rides",
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold
-                                            
-                                          ),
-                                          ),
-
-                                          
-                                          SizedBox(width: 20,),
-                                          Icon(Icons.forward,
-                                          color: Colors.white,
-                                          )
-                                        ],
-                                      ),
-                                    ),),
-          )
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => DashBoardScreen()),
+                );
+              },
+              child: Padding(
+                padding: EdgeInsets.symmetric(
+                  vertical: mediaQuery.size.height * 0.02,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Let's get rides",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: mediaQuery.size.height * 0.025,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: mediaQuery.size.width * 0.05),
+                    Icon(
+                      Icons.forward,
+                      color: Colors.white,
+                      size: mediaQuery.size.height * 0.03,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ],
-
-        
       ),
     );
   }
 }
-
